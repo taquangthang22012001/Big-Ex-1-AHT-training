@@ -1,14 +1,12 @@
 <?php
 
 namespace TODOLIST\todolist1;
+include"../Model/Task.php";
 
-require_once 'Task.php';
-
+use PDO;
 use TODOLIST\todolist1\Task;
 
-
-
-class TodoList
+class TodoListController
 {
     public static function addTask($userName, $title, $content, $priority)
     {
@@ -34,15 +32,10 @@ class TodoList
     }
     public static function getTasks($userName)
     {
-        $tasksJson = file_get_contents('Task.json');
-        $tasks = json_decode($tasksJson, true);
-        $userTasks = [];
-        foreach ($tasks as $index => $task) {
-            if (isset($task['userName']) && $task['userName'] == $userName) {
-                $task['indexIndata'] = $index;
-                $userTasks[] = $task;
-            }
-        }
-        return $userTasks;
+        $conn =connectdb();
+        $stmt = $conn->prepare("SELECT * FROM task");
+        $stmt->execute();
+        $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll();
     }
 }

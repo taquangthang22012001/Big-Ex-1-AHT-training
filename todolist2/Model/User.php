@@ -22,7 +22,7 @@ class User
         $users = json_decode($usersJson, true);
         foreach ($users as $user) {
             if ($user['userName'] == $this->username) {
-                return 'Đã có người dùng';
+                return 'Tài khoản đã được sử dụng';
             }
         }
         $users[] = ['userName' => $this->username, 'password' => $this->password];

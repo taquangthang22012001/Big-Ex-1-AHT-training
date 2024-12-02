@@ -1,7 +1,6 @@
 <?php
-
 use TODOLIST\todolist1\User;
-require_once 'User.php';
+require __DIR__ . '/../Model/User.php';
 
 ?>
 <!DOCTYPE html>
@@ -34,12 +33,12 @@ require_once 'User.php';
         </div>
         <div class="">
             <input type="submit" value="Đăng ký">
-            <a href="index.php">Đăng Nhập tại đây</a>
+            <a href="Login.php">Đăng Nhập tại đây</a>
         </div>
         <?php
         if ($_SERVER['REQUEST_METHOD'] == "POST") {
             if (empty($_POST['userName']) || empty($_POST['pass'])) {
-                echo "<p> thiếu dữ liệu cần thiết </p>";
+                echo "<p> Vui lòng nhập tài khoản và mật khẩu </p>";
             } else {
                 $userName = trim($_POST["userName"]);
                 $pass = trim($_POST["pass"]);

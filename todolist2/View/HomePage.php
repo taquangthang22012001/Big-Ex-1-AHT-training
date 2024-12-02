@@ -1,20 +1,20 @@
 <?php
 session_start();
+include"../Controller/TodoListController.php";
+use TODOLIST\todolist1\TodoListController;
+include"../ConnectDb/Connect.php";
 if (!$_SESSION['userName']) {
     header("Location: Index.php");
 }
 $userName = $_SESSION['userName'];
-require_once 'TodoList.php';
 $reslutSearch = null;
 $reslutFilter = null;
 $errMess = '';
 
-use TODOLIST\todolist1\TodoList;
-
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     if (isset($_POST["indexUpdate"])) {
-        $respone = TodoList::editTask(
+        $respone = TodoListController::editTask(
             $_POST["indexUpdate"],
             trim($_POST["title"]),
             trim($_POST["status"]),
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         header('Location: ' . $_SERVER['PHP_SELF']);
         exit();
     } else if (isset($_POST['indexDelete'])) {
-        $respone =  TodoList::removeTask($_POST['indexDelete']);
+        $respone =  TodoListController::removeTask($_POST['indexDelete']);
         header('Location: ' . $_SERVER['PHP_SELF']);
         exit();
     } elseif (isset($_POST['addTask'])) {
@@ -38,19 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
             $errMess = "Thiếu dữ liệu! Vui lòng nhập đầy đủ.";
         } else {
 
-            TodoList::addTask($userName, $title, $content, $priority);
+            TodoListController::addTask($userName, $title, $content, $priority);
             header('Location: ' . $_SERVER['PHP_SELF']);
             exit();
         }
     } elseif (isset($_POST['search'])) {
-        $reslutSearch = TodoList::search($userName, $_POST['search']);
+        $reslutSearch = TodoListController::search($userName, $_POST['search']);
     } elseif (isset($_POST['filter'])) {
-        $reslutFilter = TodoList::filter($userName, $_POST['filter']);
+        $reslutFilter = TodoListController::filter($userName, $_POST['filter']);
     } elseif (isset($_POST['listIndexToUpdate'])) {
         $listIndex = json_decode($_POST['listIndexToUpdate']);
         if (!empty($listIndex)) {
             foreach ($listIndex as  $value) {
-                TodoList::editTask($value, null, 'completed');
+                TodoListController::editTask($value, null, 'completed');
             }
         }
         header('Location: ' . $_SERVER['PHP_SELF']);
@@ -82,23 +82,25 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     </form>
 
     <?php
-    $tasks = TodoList::getTasks($_SESSION['userName']);
+    $tasks = TodoListController::getTasks($_SESSION['userName']);
     if (!empty($tasks)) {
+    
         echo '  <h2 > danh sách công việc</h2>';
         echo  '<div style="display: flex;" class="listWork" >';
         foreach ($tasks as $index => $task) {
             echo '
-        <div data-index=' . $index . ' style="padding-left: 10px;" class="task-item" indexIndata=' . $task['indexIndata'] . '>
-        <h3>Title: ' . $task['title'] . '</h3>
-        <p>Status: ' . $task['status'] . '</p>
-        <p>Content: ' . $task['content'] . '</p>
-        <p>priority: ' . $task['priority'] . '</p>
-        <input class="checkComplete" type="checkbox" id="checkbox1" name="isCompleted" data-index=' . $index . '>
+        <div data-index="' . $index . '" style="padding-left: 10px;" class="task-item"  value="' . $task['indexIndata'] . '">
+        <h3>Title: ' . htmlspecialchars($task['title']) . '</h3>
+        <p>Status: ' . htmlspecialchars($task['status']) . '</p>    
+        <p>Content: ' . htmlspecialchars($task['content']) . '</p>
+        <p>Priority: ' . htmlspecialchars($task['priority']) . '</p>
+
+        <input class="checkComplete" type="checkbox" id="checkbox1" name="isCompleted" data-index=' . $index . '  value="' . $task['indexIndata'] . '">
         <label >Đã hoàn thành</label>
         <div style="display: flex;" class="">
         <button class="editButton" data-index=' . $index . ' >Sửa</button>
         <form action="" method="POST">
-        <input style="display: none;"  name="indexDelete"   value="' . $task['indexIndata'] . '"/> 
+        <input style="display: none;"  name="indexDelete"    value="' . $task['indexIndata'] . '"/>
         <input type="submit" value="Xóa"/>
         </form>
         </div>
@@ -170,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 <select name="filter" id="">
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
-                    <option value="hard">ard</option>
+                    <option value="hard">Hard</option>
 
                 </select>
 
